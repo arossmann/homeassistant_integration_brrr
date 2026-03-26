@@ -1,0 +1,1 @@
+# homeassistant integration for brrr.now
