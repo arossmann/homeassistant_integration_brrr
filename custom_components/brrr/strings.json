@@ -1,0 +1,16 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure brrr.now",
+        "description": "Enter your brrr.now API key.",
+        "data": {
+          "api_key": "API Key"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Already configured"
+    }
+  }
+}
