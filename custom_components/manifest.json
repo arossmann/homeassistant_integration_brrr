@@ -1,0 +1,21 @@
+{
+  "domain": "brrr.now",
+  "name": "brrr.now",
+  "bluetooth": [],
+  "codeowners": ["@arossmann"],
+  "config_flow": false,
+  "dependencies": [],
+  "dhcp": [],
+  "documentation": "https://codeberg.org/arossmann/homeassistant_integration_brrr",
+  "homekit": {},
+  "integration_type": "service",
+  "iot_class": "cloud_push",
+  "issue_tracker": "https://codeberg.org/arossmann/homeassistant_integration_brrr/issues",
+  "loggers": [],
+  "mqtt": [],
+  "requirements": ["requests"],
+  "ssdp": [],
+  "usb": [],
+  "version": "0.9.0",
+  "zeroconf": []
+}
