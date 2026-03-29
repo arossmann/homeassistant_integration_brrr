@@ -8,13 +8,11 @@ from typing import Any
 from homeassistant.components.notify import (
     ATTR_DATA,
     ATTR_TITLE,
-    NotifyEntity,
-    NotifyEntityFeature,
+    BaseNotificationService,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
 from .const import (
     API_BASE_URL,
@@ -32,29 +30,27 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(
+async def async_get_service(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
-) -> None:
-    """Set up the brrr notify entity from a config entry."""
-    api_key = config_entry.data[CONF_API_KEY]
+    config: ConfigType,
+    discovery_info: DiscoveryInfoType | None = None,
+) -> BrrrNotificationService | None:
+    """Set up the brrr notification service."""
+    if discovery_info is None:
+        return None
+    api_key = discovery_info[CONF_API_KEY]
     session = async_get_clientsession(hass)
-    async_add_entities([BrrrNotifyEntity(api_key, session)])
+    return BrrrNotificationService(api_key, session)
 
 
-class BrrrNotifyEntity(NotifyEntity):
+class BrrrNotificationService(BaseNotificationService):
     """Representation of a brrr notification service."""
-
-    _attr_name = "brrr"
-    _attr_supported_features = NotifyEntityFeature.TITLE
 
     def __init__(self, api_key: str, session: Any) -> None:
         self._api_key = api_key
         self._session = session
-        self._attr_unique_id = f"brrr_{api_key}"
 
-    async def async_send_message(self, message: str, **kwargs: Any) -> None:
+    async def async_send_message(self, message: str = "", **kwargs: Any) -> None:
         """Send a notification via brrr.now."""
         title = kwargs.get(ATTR_TITLE)
         data: dict = kwargs.get(ATTR_DATA) or {}
