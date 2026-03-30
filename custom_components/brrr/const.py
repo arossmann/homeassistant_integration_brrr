@@ -32,3 +32,10 @@ ATTR_IMAGE_URL = "image_url"
 ATTR_EXPIRATION_DATE = "expiration_date"
 ATTR_FILTER_CRITERIA = "filter_criteria"
 ATTR_INTERRUPTION_LEVEL = "interruption_level"
+
+VALID_INTERRUPTION_LEVELS = [
+    "passive",
+    "active",
+    "time-sensitive",
+    "critical",
+]

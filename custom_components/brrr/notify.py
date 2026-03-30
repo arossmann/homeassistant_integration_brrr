@@ -6,13 +6,14 @@ import logging
 from typing import Any
 
 from homeassistant.components.notify import (
-    ATTR_DATA,
     ATTR_TITLE,
-    BaseNotificationService,
+    NotifyEntity,
+    NotifyEntityFeature,
 )
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
     API_BASE_URL,
@@ -30,41 +31,42 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_get_service(
+async def async_setup_entry(
     hass: HomeAssistant,
-    config: ConfigType,
-    discovery_info: DiscoveryInfoType | None = None,
-) -> BrrrNotificationService | None:
-    """Set up the brrr notification service."""
-    if discovery_info is None:
-        return None
-    api_key = discovery_info[CONF_API_KEY]
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
+    """Set up the brrr notify entity from a config entry."""
+    api_key = config_entry.data[CONF_API_KEY]
     session = async_get_clientsession(hass)
-    return BrrrNotificationService(api_key, session)
+    async_add_entities([BrrrNotifyEntity(api_key, session, dict(config_entry.data))])
 
 
-class BrrrNotificationService(BaseNotificationService):
+class BrrrNotifyEntity(NotifyEntity):
     """Representation of a brrr notification service."""
 
-    def __init__(self, api_key: str, session: Any) -> None:
+    _attr_name = "brrr"
+    _attr_supported_features = NotifyEntityFeature.TITLE
+
+    def __init__(self, api_key: str, session: Any, config: dict) -> None:
         self._api_key = api_key
         self._session = session
+        self._config = config
+        self._attr_unique_id = f"brrr_{api_key}"
 
-    async def async_send_message(self, message: str = "", **kwargs: Any) -> None:
+    async def async_send_message(self, message: str, **kwargs: Any) -> None:
         """Send a notification via brrr.now."""
         title = kwargs.get(ATTR_TITLE)
-        data: dict = kwargs.get(ATTR_DATA) or {}
 
         payload: dict[str, Any] = {"message": message}
 
         if title:
             payload["title"] = title
 
-        if ATTR_SUBTITLE in data:
-            payload["subtitle"] = data[ATTR_SUBTITLE]
+        if subtitle := self._config.get(ATTR_SUBTITLE):
+            payload["subtitle"] = subtitle
 
-        if ATTR_SOUND in data:
-            sound = data[ATTR_SOUND]
+        if sound := self._config.get(ATTR_SOUND):
             if sound not in VALID_SOUNDS:
                 _LOGGER.error(
                     "Invalid sound '%s'. Valid values: %s",
@@ -74,21 +76,21 @@ class BrrrNotificationService(BaseNotificationService):
                 return
             payload["sound"] = sound
 
-        if ATTR_OPEN_URL in data:
-            payload["open_url"] = data[ATTR_OPEN_URL]
+        if open_url := self._config.get(ATTR_OPEN_URL):
+            payload["open_url"] = open_url
 
-        if ATTR_IMAGE_URL in data:
-            payload["image_url"] = data[ATTR_IMAGE_URL]
+        if image_url := self._config.get(ATTR_IMAGE_URL):
+            payload["image_url"] = image_url
 
-        if ATTR_EXPIRATION_DATE in data:
-            payload["expiration_date"] = data[ATTR_EXPIRATION_DATE]
+        if expiration_date := self._config.get(ATTR_EXPIRATION_DATE):
+            payload["expiration_date"] = expiration_date
 
         # Translate underscore field names to the hyphenated keys the API expects
-        if ATTR_FILTER_CRITERIA in data:
-            payload["filter-criteria"] = data[ATTR_FILTER_CRITERIA]
+        if filter_criteria := self._config.get(ATTR_FILTER_CRITERIA):
+            payload["filter-criteria"] = filter_criteria
 
-        if ATTR_INTERRUPTION_LEVEL in data:
-            payload["interruption-level"] = data[ATTR_INTERRUPTION_LEVEL]
+        if interruption_level := self._config.get(ATTR_INTERRUPTION_LEVEL):
+            payload["interruption-level"] = interruption_level
 
         url = f"{API_BASE_URL}{self._api_key}"
         try:

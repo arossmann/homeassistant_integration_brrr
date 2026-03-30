@@ -3,11 +3,11 @@
 ## File structure
  ```
  custom_components/brrr/
-  ├── __init__.py          — sets up/tears down config entry, loads notify platform via discovery
+  ├── __init__.py          — sets up/tears down config entry, forwards to notify platform
   ├── manifest.json        — domain: brrr, config_flow: true
   ├── const.py             — DOMAIN, API_BASE_URL, CONF_API_KEY, VALID_SOUNDS, field name constants
-  ├── config_flow.py       — UI config flow, stores API key, prevents duplicates
-  ├── notify.py            — BrrrNotificationService, builds payload, POSTs to brrr.now API
+  ├── config_flow.py       — UI config flow, stores API key + optional defaults, prevents duplicates
+  ├── notify.py            — BrrrNotifyEntity, builds payload from config + message, POSTs to brrr.now API
   ├── strings.json         — UI text (config flow)
   └── translations/
       └── en.json          — English translations
@@ -29,19 +29,17 @@ Copy the `custom_components/brrr/` folder into your HA `config/custom_components
 
 ## Usage
 
-The integration registers `notify.brrr` as a notification action. Call it directly:
+Optional fields (sound, interruption level, subtitle, open URL, image URL) are configured once when you add the integration — no need to set them per automation.
+
+In an automation, just provide the message and an optional title:
 
 ```yaml
-action: notify.brrr
+action: notify.send_message
+target:
+  entity_id: notify.brrr
 data:
   message: "Hello from HA"
   title: "My Title"
-  data:
-    subtitle: "Optional subtitle"
-    sound: "cha_ching"
-    open_url: "https://example.com"
-    image_url: "https://example.com/image.png"
-    interruption_level: "time-sensitive"
 ```
 
 ## Creating an Automation with a Time Condition
@@ -70,26 +68,22 @@ Conditions let you restrict the automation to certain days or a time window. To 
 #### Step 3 — Add the brrr notification action
 
 1. Under **Actions**, click **Add Action** → select **Perform action**
-2. In the action search box type `notify.brrr` and select it
-3. Switch to **YAML mode** (the `</>` icon in the action card) to set optional fields:
+2. In the action search box type `notify.send_message` and select it
+3. In the **Target** field, pick the entity **brrr**
+4. Fill in **Message** and optionally **Title**
 
 ```yaml
-action: notify.brrr
+action: notify.send_message
+target:
+  entity_id: notify.brrr
 data:
   message: "Good morning! Time to start your day."
   title: "Morning Reminder"
-  data:
-    subtitle: "Have a great day"              # optional — second line of text
-    sound: "upbeat_bells"                     # optional — see valid sounds below
-    open_url: "https://example.com"           # optional — URL opened on tap
-    image_url: "https://example.com/img.png"  # optional — image in notification
-    interruption_level: "time-sensitive"      # optional — iOS interruption level
-    expiration_date: "2026-12-31T23:59:59"   # optional — discard after this time
-    filter_criteria:                          # optional — target specific devices
-      device_id: "abc123"
 ```
 
-4. Click **Save**.
+Sound, interruption level, and other defaults will be applied automatically from the integration configuration.
+
+5. Click **Save**.
 
 ### Full YAML example
 
@@ -113,35 +107,28 @@ condition:
       - fri
 
 action:
-  - action: notify.brrr
+  - action: notify.send_message
+    target:
+      entity_id: notify.brrr
     data:
       message: "Good morning! Time to start your day."
       title: "Morning Reminder"
-      data:
-        subtitle: "Have a great day"
-        sound: "upbeat_bells"
-        open_url: "https://example.com"
-        image_url: "https://example.com/img.png"
-        interruption_level: "time-sensitive"
-        # expiration_date: "2026-12-31T23:59:59"  # uncomment to set expiry
-        # filter_criteria:                         # uncomment to target a device
-        #   device_id: "abc123"
 
 mode: single
 ```
 
-### Optional field reference
+### Configuration options
 
-| Field | Type | Description |
-|---|---|---|
-| `title` | string | Bold heading of the notification |
-| `subtitle` | string | Secondary line shown below the title |
-| `sound` | string | Sound to play — must be one of the valid values listed below |
-| `open_url` | string | URL launched when the user taps the notification |
-| `image_url` | string | URL of an image shown inside the notification |
-| `interruption_level` | string | iOS interruption level: `passive`, `active`, `time-sensitive`, or `critical` |
-| `expiration_date` | string | ISO-8601 datetime after which the notification is discarded |
-| `filter_criteria` | dict | Key/value pairs used to target specific devices or groups |
+Set these when adding the integration (**Settings → Devices & Services → Add Integration → brrr**). They apply to every notification sent by this integration instance.
+
+| Field | Description |
+|---|---|
+| **API Key** *(required)* | Your brrr.now API key |
+| **Default Sound** | Sound played with every notification — see valid values below |
+| **Interruption Level** | iOS interruption level: `passive`, `active`, `time-sensitive`, `critical` |
+| **Default Subtitle** | Secondary line shown below the title |
+| **Default Open URL** | URL opened when the notification is tapped |
+| **Default Image URL** | Image shown inside the notification |
 
 ### Valid sounds
 

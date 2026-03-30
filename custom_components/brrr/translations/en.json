@@ -3,9 +3,22 @@
     "step": {
       "user": {
         "title": "Configure brrr.now",
-        "description": "Enter your brrr.now API key.",
+        "description": "Enter your brrr.now API key and set optional notification defaults.",
         "data": {
-          "api_key": "API Key"
+          "api_key": "API Key",
+          "sound": "Default Sound",
+          "interruption_level": "Interruption Level",
+          "subtitle": "Default Subtitle",
+          "open_url": "Default Open URL",
+          "image_url": "Default Image URL"
+        },
+        "data_description": {
+          "api_key": "Your brrr.now API key.",
+          "sound": "Sound played with every notification. Leave empty for the system default.",
+          "interruption_level": "iOS interruption level for every notification. Leave empty to use the app default.",
+          "subtitle": "Secondary line shown below the title in every notification.",
+          "open_url": "URL opened when the notification is tapped.",
+          "image_url": "Image shown inside every notification."
         }
       }
     },

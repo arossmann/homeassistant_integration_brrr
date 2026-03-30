@@ -6,8 +6,19 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers import selector
 
-from .const import CONF_API_KEY, DOMAIN
+from .const import (
+    ATTR_IMAGE_URL,
+    ATTR_INTERRUPTION_LEVEL,
+    ATTR_OPEN_URL,
+    ATTR_SOUND,
+    ATTR_SUBTITLE,
+    CONF_API_KEY,
+    DOMAIN,
+    VALID_INTERRUPTION_LEVELS,
+    VALID_SOUNDS,
+)
 
 
 class BrrrConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -27,6 +38,29 @@ class BrrrConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_API_KEY): str,
+                    vol.Optional(ATTR_SOUND): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=VALID_SOUNDS,
+                            mode=selector.SelectSelectorMode.DROPDOWN,
+                        )
+                    ),
+                    vol.Optional(ATTR_INTERRUPTION_LEVEL): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=VALID_INTERRUPTION_LEVELS,
+                            mode=selector.SelectSelectorMode.DROPDOWN,
+                        )
+                    ),
+                    vol.Optional(ATTR_SUBTITLE): selector.TextSelector(),
+                    vol.Optional(ATTR_OPEN_URL): selector.TextSelector(
+                        selector.TextSelectorConfig(
+                            type=selector.TextSelectorType.URL
+                        )
+                    ),
+                    vol.Optional(ATTR_IMAGE_URL): selector.TextSelector(
+                        selector.TextSelectorConfig(
+                            type=selector.TextSelectorType.URL
+                        )
+                    ),
                 }
             ),
         )
