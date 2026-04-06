@@ -1,5 +1,7 @@
 # homeassistant integration for brrr.now
 
+This integration for [Home Assistant](https://home-assistant.io) enables sending notification messages via [brrr.now](https://brrr.now),  the new, super-slim notification service.
+
 ## File structure
  ```
  custom_components/brrr/
