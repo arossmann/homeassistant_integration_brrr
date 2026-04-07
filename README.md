@@ -2,7 +2,7 @@
 
 This integration for [Home Assistant](https://home-assistant.io) enables sending notification messages via [brrr.now](https://brrr.now),  the new, super-slim notification service.
 
-The main repository is located at [Codeberg](https://codeberg.org/arossmann/homeassistant_integration_brrr), the Github repository is just the mirror to enable easy [HACS](https://hacs.xyz) installation.
+The main repository is located at [Codeberg](https://codeberg.org/arossmann/homeassistant_integration_brrr), the [Github repository](https://github.com/arossmann/homeassistant_integration_brrr) is just the mirror to enable easy [HACS](https://hacs.xyz) installation.
 
 ## File structure
  ```
