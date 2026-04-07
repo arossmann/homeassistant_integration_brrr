@@ -41,3 +41,5 @@ duck_quack        short_triple_blink   upbeat_bells    warm_soft_error
 ```
 
 > **Note:** Using an invalid sound value will log an error and abort the notification without sending it.
+
+\>\> *Jump* to [Usage](./usage.md)
