@@ -93,3 +93,11 @@ mode: single
 At the brrr app, this notification will be displayed like this:
 
 ![notification](./images/notification.jpg)
+
+# Critical alerts
+
+With the recent 1.1 release of brrr, critical alerts can now break through mute, Do not Disturb, and Focus. It's better to get notified when there's a water leakage, right?
+
+How to enable? Set in your configuration the Interruption Level to **critical** and [enable](https://brrr.now/learn/critical-alerts/) it it brrr.
+
+![critical alert](./images/critical-alert.jpg)
